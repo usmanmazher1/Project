@@ -49,10 +49,10 @@ const userget = async function(req,res){
       //let query = "SELECT * FROM company"; 
       let {user_id} = req.params;
       //const pool = client.query(`Select * from "company"`);
-      let {user_name,company_id,department_id,role_id,email,password} = req.body;
+      let {user_name,company_id,department_id,role_id,email} = req.body;
       //var updateData=req.body;
       //var sql = `UPDATE users SET ? WHERE id= ?`
-     await client.query(`Update "user" SET user_name = $1 , company_id = $2 , department_id = $3 , role_id = $4 , email = $5 , password = $6 WHERE user_id=$7`,[user_name,company_id,department_id,role_id,email,password,user_id],function(error,result){
+     await client.query(`Update "users" SET user_name = $1 , company_id = $2 , department_id = $3 , role_id = $4 , email = $5  WHERE user_id=$6`,[user_name,company_id,department_id,role_id,email,user_id],function(error,result){
             if(!error){
              res.json({
                  msg:"data updated",

@@ -3,6 +3,7 @@ require('dotenv').config();
 const client = require('./client');
 const cors = require('cors');
 const app = express();
+const login = require('./router/auth')
 const candidaterouters = require('./router/candidaterouter');
 const companyrouters = require('./router/companyrouter');
 const rolerouters = require('./router/rolerouter');
@@ -10,9 +11,10 @@ const userrouters = require('./router/userrouters');
 const departmentrouters = require('./router/departmentrouter');
 const userrolerouters = require('./router/userrolerouter');
 const jobrouters = require('./router/jobrouters');
-const login = require('./login')
+const candidate_job_maping = require('./router/candidatejobmapping');
+const teamsrouter = require('./router/team')
+const interview = require('./router/interview')
 app.use(express.json());
-app.use(cors());
 app.use(cors());
 app.listen(process.env.DB_PORT || 2500, () => {
     console.log("Server is now listening at port 2500");
@@ -26,12 +28,13 @@ client.connect()
      app.use('/role',rolerouters);  
      app.use('/department',departmentrouters);
      app.use('/user',userrouters);
-     //app.use('/users',userrouters);
-     app.use('/userbyrole',userrolerouters);
+    // app.use('/users',userrouters);
+   //  app.use('/userbyrole',userrolerouters);
      app.use('/job',jobrouters);
-     app.get('/auth/outlook', login.outlookLogin);  
-     app.get('/auth/outlook/redirect', login.outlookLoginCallback);
-
+     app.use('/candidatebyjob',candidate_job_maping);
+     app.use('/team',teamsrouter)
+     app.use('/auth',login);  
+     app.use('/interview',interview);
 
  
 

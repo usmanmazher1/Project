@@ -1,18 +1,18 @@
 
 const msal = require('@azure/msal-node');
+const { response } = require('express');
 const { Pool } = require('pg');
-const pool = require("./client")
-
-const REDIRECT_URI = 'http://localhost:2500/auth/outlook/redirect';
-
-var OUTLOOK_CLIENT_ID = '3341d794-2702-4fa1-bfc7-a5d1c9553e7b';
-var OUTLOOK_CLIENT_SECRET = 'STY7Q~Ldef1vkxPZ06hnZCLU6z6w2FXajNlcH';
+const pool = require("../client")
+var  DASHBOARD_URL = process.env.DASHBOARD_URL;
+const REDIRECT_URI = process.env.REDIRECT_URI;
+var OUTLOOK_CLIENT_ID = process.env.OUTLOOK_CLIENT_ID;
+var OUTLOOK_CLIENT_SECRET = process.env.OUTLOOK_CLIENT_SECRET;
 
 const config = {
     auth: {
-        clientId: '3341d794-2702-4fa1-bfc7-a5d1c9553e7b',
+        clientId: process.env.OUTLOOK_CLIENT_ID,
         authority: "https://login.microsoftonline.com/4815bcf5-bf11-4348-8e31-c512254994b7",
-        clientSecret: encodeURI('STY7Q~Ldef1vkxPZ06hnZCLU6z6w2FXajNlcH')
+        clientSecret: encodeURI( process.env.OUTLOOK_CLIENT_SECRET)
     },
     system: {
         loggerOptions: {
@@ -22,7 +22,10 @@ const config = {
             piiLoggingEnabled: false,
             logLevel: msal.LogLevel.Verbose,
         }
-    }
+    },
+cache:{
+    cacheLocation: 'localStorage'
+}
 };
 
 // Create msal application object
@@ -31,7 +34,7 @@ const pca = new msal.ConfidentialClientApplication(config);
 const outlookLogin = (req, res) => {
     const authCodeUrlParameters = {
         scopes: ["user.read"],
-        redirectUri: 'http://localhost:2500/auth/outlook/redirect',
+        redirectUri:process.env.REDIRECT_URI,
     };
 
     // get url to sign user in and consent to scopes needed for application
@@ -44,7 +47,7 @@ const outlookLoginCallback = (req, res) => {
     const tokenRequest = {
         code: req.query.code,
         scopes: ["user.read"],
-        redirectUri: 'http://localhost:2500/auth/outlook/redirect',
+        redirectUri: process.env.REDIRECT_URI,
     };
 
     pca.acquireTokenByCode(tokenRequest).then(async (response) => {
@@ -59,10 +62,13 @@ const outlookLoginCallback = (req, res) => {
                 res.send({statusCode: 403, message:'User not exist'})
             } else {
                 res.send({statusCode:200, token:response.accessToken})
+            //   res.redirect(`${ DASHBOARD_URL}​​​​​​​​?accesstoken=${​​​​​​​​response.accessToken}​​​​​​​​`);
+           // res.redirect(`${DASHBOARD_URL}?accesstoken=${response.accessToken}`);
             }
 
         }
-        res.send("loged in " );
+
+        res.send("looged in " );
     }).catch((error) => {
         console.log(error);
         res.status(500).send(error);
@@ -74,3 +80,9 @@ module.exports = {
     outlookLogin,
     outlookLoginCallback
 }
+
+
+
+
+
+
